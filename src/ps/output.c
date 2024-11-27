@@ -114,6 +114,13 @@ static unsigned long memory_total()
     struct meminfo_info *mem_info = NULL;
 
     if (memory_total == 0) {
+        const long page_size = sysconf(_SC_PAGESIZE);
+        const long phys_pages = sysconf(_SC_PHYS_PAGES);
+        if (page_size > 0 && phys_pages > 0)
+            return memory_total = sysconf(_SC_PHYS_PAGES) * sysconf(_SC_PAGESIZE);
+    }
+
+    if (memory_total == 0) {
         if (procps_meminfo_new(&mem_info) < 0)
 	        xerrx(EXIT_FAILURE,
                   _("Unable to get total memory"));
